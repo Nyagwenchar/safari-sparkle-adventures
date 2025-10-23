@@ -1,54 +1,56 @@
+import { useState, useEffect } from "react";
 import TourCard from "./TourCard";
-import wildlifeImage from "@/assets/tour-wildlife.jpg";
-import mountainImage from "@/assets/tour-mountain.jpg";
-import beachImage from "@/assets/tour-beach.jpg";
-import cultureImage from "@/assets/tour-culture.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 const Tours = () => {
-  const tours = [
-    {
-      tourId: "maasai-mara-safari",
-      title: "Maasai Mara Safari",
-      description: "Experience the Great Migration and witness the Big Five in their natural habitat. Expert guides, luxury camps, and unforgettable wildlife encounters await.",
-      image: wildlifeImage,
-      duration: "5 Days / 4 Nights",
-      groupSize: "Up to 6 people",
-      location: "Maasai Mara, Kenya",
-      price: "$2,499",
-      featured: true,
-    },
-    {
-      tourId: "kilimanjaro-adventure",
-      title: "Kilimanjaro Adventure",
-      description: "Conquer Africa's highest peak on this challenging yet rewarding expedition. Professional mountain guides ensure your safety on this bucket-list climb.",
-      image: mountainImage,
-      duration: "7 Days / 6 Nights",
-      groupSize: "Up to 8 people",
-      location: "Mount Kilimanjaro, Tanzania",
-      price: "$3,299",
-      featured: true,
-    },
-    {
-      tourId: "coastal-paradise",
-      title: "Coastal Paradise",
-      description: "Relax on pristine white-sand beaches along the Indian Ocean. Snorkeling, dhow cruises, and fresh seafood in a tropical paradise setting.",
-      image: beachImage,
-      duration: "4 Days / 3 Nights",
-      groupSize: "Up to 10 people",
-      location: "Diani Beach, Kenya",
-      price: "$1,899",
-    },
-    {
-      tourId: "cultural-immersion",
-      title: "Cultural Immersion",
-      description: "Connect with local Maasai communities, learn traditional crafts, witness ceremonial dances, and experience authentic African hospitality.",
-      image: cultureImage,
-      duration: "3 Days / 2 Nights",
-      groupSize: "Up to 12 people",
-      location: "Maasai Villages, Kenya",
-      price: "$999",
-    },
-  ];
+  const [tours, setTours] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTours = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('tours')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // Map database fields to component props
+        const mappedTours = data?.map(tour => ({
+          tourId: tour.tour_id,
+          title: tour.title,
+          description: tour.description,
+          image: tour.image_url,
+          duration: tour.duration,
+          groupSize: tour.group_size,
+          location: tour.location,
+          price: tour.price,
+          featured: tour.featured,
+        })) || [];
+
+        setTours(mappedTours);
+      } catch (error) {
+        console.error('Error fetching tours:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTours();
+  }, []);
+
+  if (loading) {
+    return (
+      <section id="tours" className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <p className="text-xl text-muted-foreground">Loading tours...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="tours" className="py-20 bg-background">
@@ -62,17 +64,23 @@ const Tours = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-          {tours.map((tour, index) => (
-            <div
-              key={tour.title}
-              className="animate-scale-in"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <TourCard {...tour} />
-            </div>
-          ))}
-        </div>
+        {tours.length === 0 ? (
+          <div className="text-center">
+            <p className="text-xl text-muted-foreground">No tours available at the moment.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+            {tours.map((tour, index) => (
+              <div
+                key={tour.tourId}
+                className="animate-scale-in"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <TourCard {...tour} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

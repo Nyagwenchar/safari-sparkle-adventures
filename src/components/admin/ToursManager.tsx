@@ -178,7 +178,6 @@ const ToursManager = () => {
                   onChange={(e) => setFormData({ ...formData, tour_id: e.target.value })}
                   placeholder="maasai-mara-safari"
                   required
-                  disabled={!!editingTour}
                 />
               </div>
               <div className="space-y-2">
