@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Palmtree } from "lucide-react";
+import { Menu, X, Palmtree, Shield, LogOut, LogIn } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navigation = () => {
   const navigate = useNavigate();
+  const { user, isAdmin, signOut } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -25,6 +27,12 @@ const Navigation = () => {
 
   const handleNavClick = (path: string) => {
     navigate(path);
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
     setIsMobileMenuOpen(false);
   };
 
@@ -61,6 +69,37 @@ const Navigation = () => {
             >
               Book Now
             </Button>
+            {user ? (
+              <>
+                {isAdmin && (
+                  <Button
+                    variant="outline"
+                    onClick={() => handleNavClick("/admin")}
+                    className="gap-2"
+                  >
+                    <Shield className="h-4 w-4" />
+                    Admin
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  onClick={handleSignOut}
+                  className="gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={() => handleNavClick("/auth")}
+                className="gap-2"
+              >
+                <LogIn className="h-4 w-4" />
+                Sign In
+              </Button>
+            )}
           </div>
 
           <button
@@ -94,6 +133,37 @@ const Navigation = () => {
             >
               Book Now
             </Button>
+            {user ? (
+              <>
+                {isAdmin && (
+                  <Button
+                    variant="outline"
+                    onClick={() => handleNavClick("/admin")}
+                    className="w-full gap-2"
+                  >
+                    <Shield className="h-4 w-4" />
+                    Admin Panel
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  onClick={handleSignOut}
+                  className="w-full gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={() => handleNavClick("/auth")}
+                className="w-full gap-2"
+              >
+                <LogIn className="h-4 w-4" />
+                Sign In
+              </Button>
+            )}
           </div>
         </div>
       )}
