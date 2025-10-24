@@ -110,7 +110,10 @@ export type Database = {
           group_size: string
           id: string
           image_url: string
+          includes: Json | null
+          itinerary: Json | null
           location: string
+          overview: string | null
           price: string
           title: string
           tour_id: string
@@ -124,7 +127,10 @@ export type Database = {
           group_size: string
           id?: string
           image_url: string
+          includes?: Json | null
+          itinerary?: Json | null
           location: string
+          overview?: string | null
           price: string
           title: string
           tour_id: string
@@ -138,7 +144,10 @@ export type Database = {
           group_size?: string
           id?: string
           image_url?: string
+          includes?: Json | null
+          itinerary?: Json | null
           location?: string
+          overview?: string | null
           price?: string
           title?: string
           tour_id?: string
@@ -179,10 +188,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      promote_to_admin: {
-        Args: { target_user_id: string }
-        Returns: undefined
-      }
+      promote_to_admin: { Args: { target_user_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"

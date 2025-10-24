@@ -21,6 +21,15 @@ interface Tour {
   location: string;
   price: string;
   featured: boolean;
+  overview?: string;
+  includes?: string[];
+  itinerary?: { day: number; title: string; description: string }[];
+}
+
+interface ItineraryDay {
+  day: number;
+  title: string;
+  description: string;
 }
 
 const ToursManager = () => {
@@ -28,6 +37,7 @@ const ToursManager = () => {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTour, setEditingTour] = useState<Tour | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     tour_id: "",
     title: "",
@@ -38,6 +48,15 @@ const ToursManager = () => {
     location: "",
     price: "",
     featured: false,
+    overview: "",
+    includes: [] as string[],
+    itinerary: [] as ItineraryDay[],
+  });
+  const [newInclude, setNewInclude] = useState("");
+  const [newItinerary, setNewItinerary] = useState<ItineraryDay>({
+    day: 1,
+    title: "",
+    description: "",
   });
 
   useEffect(() => {
@@ -52,7 +71,14 @@ const ToursManager = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setTours(data || []);
+      
+      const mappedTours = data?.map(tour => ({
+        ...tour,
+        includes: (tour.includes as unknown as string[]) || [],
+        itinerary: (tour.itinerary as unknown as ItineraryDay[]) || [],
+      })) || [];
+      
+      setTours(mappedTours);
     } catch (error: any) {
       toast.error("Failed to load tours");
     } finally {
@@ -60,14 +86,49 @@ const ToursManager = () => {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('tour-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('tour-images')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, image_url: publicUrl });
+      toast.success("Image uploaded successfully");
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      const dataToSubmit = {
+        ...formData,
+        includes: formData.includes as any,
+        itinerary: formData.itinerary as any,
+      };
+
       if (editingTour) {
         const { error } = await supabase
           .from("tours")
-          .update(formData)
+          .update(dataToSubmit)
           .eq("id", editingTour.id);
 
         if (error) throw error;
@@ -75,7 +136,7 @@ const ToursManager = () => {
       } else {
         const { error } = await supabase
           .from("tours")
-          .insert([formData]);
+          .insert([dataToSubmit]);
 
         if (error) throw error;
         toast.success("Tour created successfully");
@@ -118,6 +179,9 @@ const ToursManager = () => {
       location: tour.location,
       price: tour.price,
       featured: tour.featured,
+      overview: tour.overview || "",
+      includes: tour.includes || [],
+      itinerary: tour.itinerary || [],
     });
     setDialogOpen(true);
   };
@@ -134,7 +198,12 @@ const ToursManager = () => {
       location: "",
       price: "",
       featured: false,
+      overview: "",
+      includes: [],
+      itinerary: [],
     });
+    setNewInclude("");
+    setNewItinerary({ day: 1, title: "", description: "" });
   };
 
   if (loading) {
@@ -200,14 +269,133 @@ const ToursManager = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="image_url">Image URL</Label>
+                <Label htmlFor="image">Tour Image</Label>
                 <Input
-                  id="image_url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
-                  required
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploading}
                 />
+                {formData.image_url && (
+                  <img src={formData.image_url} alt="Preview" className="mt-2 h-32 w-full object-cover rounded" />
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="overview">Overview (Landing Page)</Label>
+                <Textarea
+                  id="overview"
+                  value={formData.overview}
+                  onChange={(e) => setFormData({ ...formData, overview: e.target.value })}
+                  rows={3}
+                  placeholder="Embark on an unforgettable journey..."
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>What's Included</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newInclude}
+                    onChange={(e) => setNewInclude(e.target.value)}
+                    placeholder="e.g., Professional safari guide"
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      if (newInclude.trim()) {
+                        setFormData({ ...formData, includes: [...formData.includes, newInclude.trim()] });
+                        setNewInclude("");
+                      }
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                {formData.includes.length > 0 && (
+                  <ul className="mt-2 space-y-1">
+                    {formData.includes.map((item, index) => (
+                      <li key={index} className="flex items-center justify-between bg-muted p-2 rounded">
+                        <span>{item}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setFormData({
+                              ...formData,
+                              includes: formData.includes.filter((_, i) => i !== index),
+                            });
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label>Itinerary</Label>
+                <div className="grid grid-cols-12 gap-2">
+                  <Input
+                    type="number"
+                    className="col-span-2"
+                    value={newItinerary.day}
+                    onChange={(e) => setNewItinerary({ ...newItinerary, day: parseInt(e.target.value) })}
+                    placeholder="Day"
+                  />
+                  <Input
+                    className="col-span-4"
+                    value={newItinerary.title}
+                    onChange={(e) => setNewItinerary({ ...newItinerary, title: e.target.value })}
+                    placeholder="Title"
+                  />
+                  <Input
+                    className="col-span-5"
+                    value={newItinerary.description}
+                    onChange={(e) => setNewItinerary({ ...newItinerary, description: e.target.value })}
+                    placeholder="Description"
+                  />
+                  <Button
+                    type="button"
+                    className="col-span-1"
+                    onClick={() => {
+                      if (newItinerary.title && newItinerary.description) {
+                        setFormData({
+                          ...formData,
+                          itinerary: [...formData.itinerary, newItinerary].sort((a, b) => a.day - b.day),
+                        });
+                        setNewItinerary({ day: newItinerary.day + 1, title: "", description: "" });
+                      }
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                {formData.itinerary.length > 0 && (
+                  <ul className="mt-2 space-y-2">
+                    {formData.itinerary.map((item, index) => (
+                      <li key={index} className="flex items-start justify-between bg-muted p-2 rounded">
+                        <div>
+                          <strong>Day {item.day}:</strong> {item.title} - {item.description}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setFormData({
+                              ...formData,
+                              itinerary: formData.itinerary.filter((_, i) => i !== index),
+                            });
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
