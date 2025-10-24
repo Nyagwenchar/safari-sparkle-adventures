@@ -84,7 +84,7 @@ const TourDetails = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/60 to-background" />
         <div className="absolute bottom-0 left-0 right-0 p-8">
           <div className="container mx-auto">
-            <Button variant="ghost" onClick={() => navigate("/")} className="mb-4">
+            <Button variant="ghost" onClick={() => navigate("/tours")} className="mb-4">
               <ArrowLeft className="mr-2 h-4 w-4" />Back to Tours
             </Button>
             <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-4">{tour.title}</h1>
