@@ -103,6 +103,7 @@ export type Database = {
       }
       tours: {
         Row: {
+          booking_count: number
           created_at: string
           description: string
           duration: string
@@ -120,6 +121,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          booking_count?: number
           created_at?: string
           description: string
           duration: string
@@ -137,6 +139,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          booking_count?: number
           created_at?: string
           description?: string
           duration?: string
