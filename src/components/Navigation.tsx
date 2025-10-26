@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Palmtree, Shield, LogOut, LogIn } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const Navigation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isAdmin, signOut } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -26,7 +27,12 @@ const Navigation = () => {
   ];
 
   const handleNavClick = (path: string) => {
-    navigate(path);
+    if (location.pathname === path) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.location.reload();
+    } else {
+      navigate(path);
+    }
     setIsMobileMenuOpen(false);
   };
 
