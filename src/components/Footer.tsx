@@ -1,7 +1,18 @@
 import { Palmtree, Facebook, Instagram, Twitter, Mail } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleLinkClick = (path: string) => {
+    if (location.pathname === path) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      navigate(path);
+    }
+  };
+
   return (
     <footer id="about" className="bg-primary text-primary-foreground py-12">
       <div className="container mx-auto px-4">
@@ -36,16 +47,16 @@ const Footer = () => {
             <h3 className="text-lg font-bold mb-4">Quick Links</h3>
             <ul className="space-y-2 text-primary-foreground/80">
               <li>
-                <Link to="/tours" className="hover:text-accent transition-colors">Our Tours</Link>
+                <button onClick={() => handleLinkClick("/tours")} className="hover:text-accent transition-colors">Our Tours</button>
               </li>
               <li>
-                <Link to="/destinations" className="hover:text-accent transition-colors">Destinations</Link>
+                <button onClick={() => handleLinkClick("/destinations")} className="hover:text-accent transition-colors">Destinations</button>
               </li>
               <li>
-                <Link to="/about" className="hover:text-accent transition-colors">About Us</Link>
+                <button onClick={() => handleLinkClick("/about")} className="hover:text-accent transition-colors">About Us</button>
               </li>
               <li>
-                <Link to="/contact" className="hover:text-accent transition-colors">Book Now</Link>
+                <button onClick={() => handleLinkClick("/contact")} className="hover:text-accent transition-colors">Book Now</button>
               </li>
             </ul>
           </div>
@@ -54,16 +65,16 @@ const Footer = () => {
             <h3 className="text-lg font-bold mb-4">Travel Info</h3>
             <ul className="space-y-2 text-primary-foreground/80">
               <li>
-                <Link to="/booking-terms" className="hover:text-accent transition-colors">Booking Terms</Link>
+                <button onClick={() => handleLinkClick("/booking-terms")} className="hover:text-accent transition-colors">Booking Terms</button>
               </li>
               <li>
-                <Link to="/travel-insurance" className="hover:text-accent transition-colors">Travel Insurance</Link>
+                <button onClick={() => handleLinkClick("/travel-insurance")} className="hover:text-accent transition-colors">Travel Insurance</button>
               </li>
               <li>
-                <Link to="/visa-requirements" className="hover:text-accent transition-colors">Visa Requirements</Link>
+                <button onClick={() => handleLinkClick("/visa-requirements")} className="hover:text-accent transition-colors">Visa Requirements</button>
               </li>
               <li>
-                <Link to="/safari-tips" className="hover:text-accent transition-colors">Safari Tips</Link>
+                <button onClick={() => handleLinkClick("/safari-tips")} className="hover:text-accent transition-colors">Safari Tips</button>
               </li>
             </ul>
           </div>
