@@ -2,11 +2,20 @@ import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
 const Home = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleQuickLinkClick = (path: string) => {
+    if (location.pathname === path) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      navigate(path);
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -30,7 +39,7 @@ const Home = () => {
               variant="outline"
               size="lg"
               className="h-auto py-8 flex-col gap-3 hover:border-primary hover:bg-primary/5 bg-card/60 backdrop-blur-sm border-2 rounded-2xl"
-              onClick={() => navigate("/tours")}
+              onClick={() => handleQuickLinkClick("/tours")}
             >
               <span className="text-2xl font-bold">Explore Tours</span>
               <span className="text-muted-foreground">Discover our curated safari experiences</span>
@@ -41,7 +50,7 @@ const Home = () => {
               variant="outline"
               size="lg"
               className="h-auto py-8 flex-col gap-3 hover:border-primary hover:bg-primary/5 bg-card/60 backdrop-blur-sm border-2 rounded-2xl"
-              onClick={() => navigate("/destinations")}
+              onClick={() => handleQuickLinkClick("/destinations")}
             >
               <span className="text-2xl font-bold">Our Destinations</span>
               <span className="text-muted-foreground">Explore the wonders of Kenya</span>
@@ -52,7 +61,7 @@ const Home = () => {
               variant="outline"
               size="lg"
               className="h-auto py-8 flex-col gap-3 hover:border-primary hover:bg-primary/5 bg-card/60 backdrop-blur-sm border-2 rounded-2xl"
-              onClick={() => navigate("/contact")}
+              onClick={() => handleQuickLinkClick("/contact")}
             >
               <span className="text-2xl font-bold">Book Now</span>
               <span className="text-muted-foreground">Start planning your adventure</span>

@@ -29,7 +29,6 @@ const Navigation = () => {
   const handleNavClick = (path: string) => {
     if (location.pathname === path) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      window.location.reload();
     } else {
       navigate(path);
     }
