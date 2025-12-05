@@ -1,4 +1,4 @@
-import { Palmtree, Facebook, Instagram, Twitter, Mail, ArrowUp } from "lucide-react";
+import { Palmtree, Facebook, Instagram, Twitter, Mail } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const Footer = () => {
@@ -13,25 +13,11 @@ const Footer = () => {
     }
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
     <footer id="about" className="bg-gradient-to-b from-primary to-primary/95 text-primary-foreground relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
       <div className="absolute bottom-0 right-0 w-80 h-80 bg-secondary/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
-      
-      {/* Back to top button */}
-      <div className="container mx-auto px-4 relative">
-        <button 
-          onClick={scrollToTop}
-          className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-accent text-accent-foreground shadow-xl hover:scale-110 transition-transform flex items-center justify-center"
-        >
-          <ArrowUp className="h-5 w-5" />
-        </button>
-      </div>
 
       <div className="container mx-auto px-4 pt-16 pb-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
