@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import TourCard from "./TourCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "./ui/input";
-import { Search } from "lucide-react";
+import { Search, Compass } from "lucide-react";
 
 const Tours = () => {
   const [tours, setTours] = useState<any[]>([]);
@@ -20,7 +20,6 @@ const Tours = () => {
 
         if (error) throw error;
 
-        // Map database fields to component props
         const mappedTours = data?.map(tour => ({
           tourId: tour.tour_id,
           title: tour.title,
@@ -34,7 +33,6 @@ const Tours = () => {
           bookingCount: tour.booking_count || 0,
         })) || [];
 
-        // Sort: featured tours first, then by booking count
         mappedTours.sort((a, b) => {
           if (a.featured && !b.featured) return -1;
           if (!a.featured && b.featured) return 1;
@@ -68,7 +66,10 @@ const Tours = () => {
       <section id="tours" className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <p className="text-xl text-muted-foreground">Loading tours...</p>
+            <div className="inline-flex items-center gap-2 text-muted-foreground">
+              <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <span>Loading tours...</span>
+            </div>
           </div>
         </div>
       </section>
@@ -76,9 +77,15 @@ const Tours = () => {
   }
 
   return (
-    <section id="tours" className="py-20 bg-background">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-8 animate-fade-in">
+    <section id="tours" className="py-20 bg-background relative overflow-hidden">
+      <div className="absolute inset-0 pattern-dots opacity-30" />
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-10 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-4 py-2 mb-4 rounded-full bg-primary/10 border border-primary/20">
+            <Compass className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium text-primary">Curated Experiences</span>
+          </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
             Featured Safari Tours
           </h2>
@@ -87,9 +94,10 @@ const Tours = () => {
           </p>
         </div>
 
+        {/* Search */}
         <div className="max-w-2xl mx-auto mb-12 relative">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Search tours by name, location, or description..."
@@ -97,14 +105,14 @@ const Tours = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              className="pl-10 h-12 text-base"
+              className="pl-12 h-14 text-base rounded-2xl border-2 bg-card shadow-sm focus:shadow-md transition-shadow"
             />
           </div>
           
           {showSuggestions && searchQuery === "" && topBookedTours.length > 0 && (
-            <div className="absolute top-full mt-2 w-full bg-card border border-border rounded-lg shadow-lg z-10 overflow-hidden">
-              <div className="p-3 border-b border-border">
-                <p className="text-sm font-medium text-muted-foreground">Most Booked Tours</p>
+            <div className="absolute top-full mt-2 w-full bg-card border-2 border-border rounded-2xl shadow-xl z-20 overflow-hidden">
+              <div className="p-4 border-b border-border bg-muted/30">
+                <p className="text-sm font-semibold text-foreground">🔥 Most Booked Tours</p>
               </div>
               {topBookedTours.map((tour) => (
                 <button
@@ -113,11 +121,10 @@ const Tours = () => {
                     setSearchQuery(tour.title);
                     setShowSuggestions(false);
                   }}
-                  className="w-full text-left px-4 py-3 hover:bg-accent transition-colors flex items-center gap-2"
+                  className="w-full text-left px-4 py-3 hover:bg-primary/5 transition-colors flex items-center gap-3"
                 >
-                  <span>🔥</span>
-                  <span className="text-foreground">{tour.title}</span>
-                  <span className="text-xs text-muted-foreground ml-auto">
+                  <span className="text-foreground font-medium">{tour.title}</span>
+                  <span className="text-xs text-muted-foreground ml-auto px-2 py-1 bg-muted rounded-full">
                     {tour.bookingCount} bookings
                   </span>
                 </button>
@@ -126,14 +133,18 @@ const Tours = () => {
           )}
         </div>
 
+        {/* Tours Grid */}
         {filteredTours.length === 0 ? (
-          <div className="text-center">
+          <div className="text-center py-12">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+              <Search className="h-8 w-8 text-muted-foreground" />
+            </div>
             <p className="text-xl text-muted-foreground">
               {searchQuery ? "No tours match your search." : "No tours available at the moment."}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {filteredTours.map((tour, index) => (
               <div
                 key={tour.tourId}

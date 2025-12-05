@@ -43,42 +43,57 @@ const Navigation = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled
-          ? "bg-card/95 backdrop-blur-md shadow-lg"
+          ? "bg-card/95 backdrop-blur-xl shadow-lg border-b border-border/50"
           : "bg-transparent"
       }`}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
-          <Link to="/" className="flex items-center space-x-2">
-            <Palmtree className="h-8 w-8 text-primary" />
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-3 group">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+              isScrolled ? "bg-primary/10" : "bg-card/20 backdrop-blur-sm"
+            }`}>
+              <Palmtree className="h-6 w-6 text-primary" />
+            </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               MB Travels
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center space-x-8">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-2">
             {navLinks.map((link) => (
               <button
                 key={link.name}
                 onClick={() => handleNavClick(link.href)}
-                className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+                  location.pathname === link.href
+                    ? "bg-primary/10 text-primary"
+                    : "text-foreground hover:bg-muted hover:text-primary"
+                }`}
               >
                 {link.name}
               </button>
             ))}
+            
+            <div className="w-px h-6 bg-border mx-2" />
+            
             <Button
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all"
               onClick={() => handleNavClick("/contact")}
             >
               Book Now
             </Button>
+            
             {user ? (
               <>
                 {isAdmin && (
                   <Button
                     variant="outline"
+                    size="sm"
                     onClick={() => handleNavClick("/admin")}
                     className="gap-2"
                   >
@@ -87,19 +102,20 @@ const Navigation = () => {
                   </Button>
                 )}
                 <Button
-                  variant="outline"
+                  variant="ghost"
+                  size="sm"
                   onClick={handleSignOut}
-                  className="gap-2"
+                  className="gap-2 text-muted-foreground hover:text-foreground"
                 >
                   <LogOut className="h-4 w-4" />
-                  Sign Out
                 </Button>
               </>
             ) : (
               <Button
-                variant="outline"
+                variant="ghost"
+                size="sm"
                 onClick={() => handleNavClick("/auth")}
-                className="gap-2"
+                className="gap-2 text-muted-foreground hover:text-foreground"
               >
                 <LogIn className="h-4 w-4" />
                 Sign In
@@ -107,8 +123,9 @@ const Navigation = () => {
             )}
           </div>
 
+          {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2"
+            className="md:hidden p-2 rounded-xl hover:bg-muted transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? (
@@ -120,55 +137,64 @@ const Navigation = () => {
         </div>
       </div>
 
+      {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-card/95 backdrop-blur-md border-t border-border animate-slide-up">
-          <div className="container mx-auto px-4 py-4 space-y-4">
+        <div className="md:hidden bg-card/98 backdrop-blur-xl border-t border-border animate-fade-in">
+          <div className="container mx-auto px-4 py-6 space-y-2">
             {navLinks.map((link) => (
               <button
                 key={link.name}
                 onClick={() => handleNavClick(link.href)}
-                className="block py-2 text-foreground hover:text-primary transition-colors duration-200"
+                className={`block w-full text-left py-3 px-4 rounded-xl font-medium transition-colors ${
+                  location.pathname === link.href
+                    ? "bg-primary/10 text-primary"
+                    : "text-foreground hover:bg-muted"
+                }`}
               >
                 {link.name}
               </button>
             ))}
-            <Button
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-              onClick={() => handleNavClick("/contact")}
-            >
-              Book Now
-            </Button>
-            {user ? (
-              <>
-                {isAdmin && (
+            
+            <div className="pt-4 space-y-3">
+              <Button
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                onClick={() => handleNavClick("/contact")}
+              >
+                Book Now
+              </Button>
+              
+              {user ? (
+                <>
+                  {isAdmin && (
+                    <Button
+                      variant="outline"
+                      onClick={() => handleNavClick("/admin")}
+                      className="w-full gap-2"
+                    >
+                      <Shield className="h-4 w-4" />
+                      Admin Panel
+                    </Button>
+                  )}
                   <Button
-                    variant="outline"
-                    onClick={() => handleNavClick("/admin")}
+                    variant="ghost"
+                    onClick={handleSignOut}
                     className="w-full gap-2"
                   >
-                    <Shield className="h-4 w-4" />
-                    Admin Panel
+                    <LogOut className="h-4 w-4" />
+                    Sign Out
                   </Button>
-                )}
+                </>
+              ) : (
                 <Button
                   variant="outline"
-                  onClick={handleSignOut}
+                  onClick={() => handleNavClick("/auth")}
                   className="w-full gap-2"
                 >
-                  <LogOut className="h-4 w-4" />
-                  Sign Out
+                  <LogIn className="h-4 w-4" />
+                  Sign In
                 </Button>
-              </>
-            ) : (
-              <Button
-                variant="outline"
-                onClick={() => handleNavClick("/auth")}
-                className="w-full gap-2"
-              >
-                <LogIn className="h-4 w-4" />
-                Sign In
-              </Button>
-            )}
+              )}
+            </div>
           </div>
         </div>
       )}
