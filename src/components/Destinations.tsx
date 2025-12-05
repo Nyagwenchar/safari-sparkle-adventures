@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MapPin, Camera, Mountain, Waves } from "lucide-react";
+import { MapPin, Camera, Mountain, Waves, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -7,7 +7,6 @@ const Destinations = () => {
   const [destinations, setDestinations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Map icon strings to icon components
   const iconMap: { [key: string]: any } = {
     MapPin,
     Camera,
@@ -25,9 +24,8 @@ const Destinations = () => {
 
         if (error) throw error;
 
-        // Map database fields including icon strings to components
         const mappedDestinations = data?.map(dest => ({
-          icon: iconMap[dest.icon] || MapPin, // fallback to MapPin if icon not found
+          icon: iconMap[dest.icon] || MapPin,
           title: dest.title,
           description: dest.description,
           highlight: dest.highlight,
@@ -49,7 +47,10 @@ const Destinations = () => {
       <section id="destinations" className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <p className="text-xl text-muted-foreground">Loading destinations...</p>
+            <div className="inline-flex items-center gap-2 text-muted-foreground">
+              <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <span>Loading destinations...</span>
+            </div>
           </div>
         </div>
       </section>
@@ -57,9 +58,16 @@ const Destinations = () => {
   }
 
   return (
-    <section id="destinations" className="py-20 bg-muted/30">
-      <div className="container mx-auto px-4">
+    <section id="destinations" className="py-20 relative overflow-hidden">
+      <div className="absolute inset-0 section-nature" />
+      <div className="absolute inset-0 pattern-lines" />
+      
+      <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-4 py-2 mb-4 rounded-full bg-secondary/10 border border-secondary/20">
+            <Sparkles className="h-4 w-4 text-secondary" />
+            <span className="text-sm font-medium text-secondary">Top Destinations</span>
+          </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
             Explore Our Destinations
           </h2>
@@ -79,21 +87,30 @@ const Destinations = () => {
               return (
                 <Card
                   key={destination.title}
-                  className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 bg-card/70 backdrop-blur-sm border-2 rounded-2xl animate-scale-in"
+                  className="group card-elevated animate-scale-in overflow-hidden"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <CardContent className="p-6 text-center">
-                    <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                      <Icon className="h-8 w-8 text-primary" />
+                  <CardContent className="p-0">
+                    {/* Decorative header */}
+                    <div className="h-24 bg-gradient-to-br from-secondary/20 via-primary/10 to-accent/10 relative">
+                      <div className="absolute inset-0 pattern-dots opacity-30" />
+                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
+                        <div className="w-16 h-16 rounded-2xl bg-card shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-border/50">
+                          <Icon className="h-8 w-8 text-primary" />
+                        </div>
+                      </div>
                     </div>
-                    <h3 className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors">
-                      {destination.title}
-                    </h3>
-                    <p className="text-muted-foreground mb-4">
-                      {destination.description}
-                    </p>
-                    <div className="inline-block px-3 py-1 rounded-full bg-accent/10 text-accent text-sm font-medium">
-                      {destination.highlight}
+                    
+                    <div className="pt-12 pb-6 px-6 text-center">
+                      <h3 className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors">
+                        {destination.title}
+                      </h3>
+                      <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
+                        {destination.description}
+                      </p>
+                      <div className="inline-block px-4 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-medium border border-accent/20">
+                        {destination.highlight}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
